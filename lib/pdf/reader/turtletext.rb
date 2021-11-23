@@ -32,6 +32,10 @@ class PDF::Reader::Turtletext
     options[:y_precision] ||= 3
   end
 
+  def coordinates_transposed?
+    options[:transpose_coordinates] ||= false
+  end
+
   # Returns positional (with fuzzed y positioning) text content collection as a hash:
   #   [ fuzzed_y_position, [[x_position,content]] ]
   def content(page=1)
@@ -153,7 +157,8 @@ class PDF::Reader::Turtletext
   private
 
     def load_content(page)
-      receiver = PDF::Reader::PositionalTextReceiver.new
+      # receiver = PDF::Reader::PositionalTextReceiver.new
+      receiver = (coordinates_transposed? ? PDF::Reader::TransposedPositionalTextReceiver.new : PDF::Reader::PositionalTextReceiver.new)
       reader.page(page).walk(receiver)
       receiver.content
     end
